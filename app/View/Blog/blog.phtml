@@ -1,0 +1,105 @@
+Это Ваш блог <?= $this->user->getName(); ?><br><? ?>
+Ваш номер ID # <?= $this->user->getId(); ?>
+<br>
+<br>
+<form enctype="multipart/form-data" action="/blog/sendPost" method="post">
+    Message:<br>
+    <textarea name="message" style="width: 250px; height: 100px;"></textarea><br>
+    Прикрепить картинку:<br>
+    <input name="userfile" type="file" value=""><br>
+    <input type="submit" value="Send">
+</form>
+
+<?
+?><br><? ?>
+
+<form action="/user/logout">
+    <input type="submit" value="Выйти">
+</form>
+<? $posts = $this->posts; ?>
+<? $posts_name = $this->posts_name; ?>
+<? $posts_user_id = $this->posts_user_id; ?>
+
+<? foreach ($posts as $post => $val): ?>
+    <div class="post">
+        <span class="user">Сообщение от пользователя
+
+            <b><?= strip_tags($posts_name[$val['user_id']]['name']); ?></b>
+
+        	с ID_#      <?= $val['user_id'] ?>
+        	отправлено  <?= $val['createdAt']; ?></span>
+
+        <? if (file_exists('images/' . $val['id'] . '.png')):
+            $fileId = $val['id']; ?>
+            <img src="images/<? $fileId; ?>.png/?id=<?= $val['id']; ?>"></img>
+            <img src="../images/23.png"></img>
+        <? endif; ?>
+
+        <div class="message"><?= $val['texts']; ?></div>
+
+        <? if ($this->user->getId() == ADMIN): ?>
+            <form method="post" action="/blog/deletePost">
+                <input type='hidden' name='id' value="<?= $fileId; ?>">
+                <input type="submit" value="Удалить">
+            </form>
+        <? endif; ?>
+
+    </div>
+<? endforeach; ?>
+
+<form action="/blog/api" method="post">
+    Введите ID юзера для просмотра его постов:<br>
+    <input type="number" name="user_id_api"> <br>
+</form>
+
+<?php
+if (isset($posts_user_id)):
+
+    foreach ($this->posts_user_id as $post => $val): ?>
+        <div class="post">
+        <span class="user">Сообщение от пользователя
+
+            <b><?= strip_tags($posts_name[$val['user_id']]['name']); ?></b>
+
+        	с ID_#      <?= $val['user_id'] ?>
+        	отправлено  <?= $val['createdAt']; ?></span>
+
+            <? $fileId = $val['id'];
+
+            if (file_exists('images/' . $val['id'] . '.png')):
+
+                ?>
+                <img src="images/<? $fileId; ?>.png/?id=<?= $val['id']; ?>"></img>
+                <img src="../images/23.png"></img>
+
+            <? endif; ?>
+            <div class="message"><?= $val['texts']; ?></div>
+            </form>
+        </div>
+    <? endforeach;
+    echo '<pre>';
+    echo "В JSON формате ", json_encode($this->posts_user_id,
+        JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE), "\n\n";
+    echo '</pre>';
+    ?>
+
+<? endif; ?>
+
+<style>
+    .post {
+        border: 1px solid grey;
+        margin-top: 10px;
+        padding: 5px;
+        width: 250px;
+    }
+
+    .user {
+        color: grey;
+        font-size: 11px;
+    }
+
+    .message {
+        margin-top: 5px;
+        padding-left: 5px;
+    }
+</style>
